@@ -1,7 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Random;
 
-public class HelloJNI {  // Save as HelloJNI.java
+public class HelloJNI {
+    private static JTextField mean;  // Save as HelloJNI.java
+    private static JTextField std;
+
     static {
         System.loadLibrary("hello"); // Load native library hello.dll (Windows) or libhello.so (Unixes)
         //  at runtime
@@ -11,10 +15,6 @@ public class HelloJNI {  // Save as HelloJNI.java
     // Test Driver
     public static void main(String[] args) {
         HelloJNI obj = new HelloJNI();  // Create an instance and invoke the native method
-        obj.sayHello();
-        int[] a = new int[]{-2, -1, 0, 1, 2, 3};
-        System.out.println(obj.calculateMean(a));
-        System.out.println(obj.calculateSTDDev(a));
 
         JFrame.setDefaultLookAndFeelDecorated(true);
         JFrame frame = new JFrame("Layout");
@@ -26,10 +26,18 @@ public class HelloJNI {  // Save as HelloJNI.java
         JTextField textField = new JTextField("TextBox");
         textField.setMaximumSize(textField.getPreferredSize());
         JButton jb1 = new JButton("Go");
+        jb1.addActionListener(e -> {
+            int n = Integer.parseInt(textField.getText());
+            if (n > 0) {
+                int[] arr = generateArray(n);
+                update(obj.calculateMean(arr), obj.calculateSTDDev(arr));
+            }
+        });
         jb1.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel mean_label = new JLabel("Mean");
-        JTextField mean = new JTextField("TextBox");
+        mean = new JTextField("TextBox");
+        mean.setSize(mean.getPreferredSize());
         JPanel mean_panel = new JPanel();
         mean_panel.setLayout(new FlowLayout());
         mean_panel.add(mean_label);
@@ -37,8 +45,8 @@ public class HelloJNI {  // Save as HelloJNI.java
         mean_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel std_label = new JLabel("Standard deviation");
-        JTextField std = new JTextField("TextBox");
-        std.setSize(200, 50);
+        std = new JTextField("TextBox");
+        std.setSize(std.getPreferredSize());
         JPanel std_panel = new JPanel();
         std_panel.setLayout(new FlowLayout());
         std_panel.add(std_label);
@@ -58,11 +66,22 @@ public class HelloJNI {  // Save as HelloJNI.java
         frame.add(panel);
         frame.pack();
         frame.setVisible(true);
-
     }
 
-    // Declare an instance native method sayHello() which receives no parameter and returns void
-    private native void sayHello();
+    private static void update(double calculateMean, double calculateSTDDev) {
+        mean.setText(String.format("%.3f", calculateMean));
+        std.setText(String.format("%.3f", calculateSTDDev));
+    }
+
+
+    private static int[] generateArray(int n) {
+        int[] arr = new int[n];
+        Random r = new Random();
+        for (int i = 0; i < n; i++) {
+            arr[i] = r.nextInt(100);
+        }
+        return arr;
+    }
 
     public native double calculateSTDDev(int[] numbers);
 

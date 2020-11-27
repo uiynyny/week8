@@ -7,13 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
- * Class:     HelloJNI
- * Method:    sayHello
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_HelloJNI_sayHello
-  (JNIEnv *, jobject);
 
 /*
  * Class:     HelloJNI
